@@ -11,3 +11,12 @@ class Pokemon(models.Model):
     class Meta:
         verbose_name = "Pokemon"
         verbose_name_plural = "Pokemons"
+
+
+class PokemonEntity(models.Model):
+    lat = models.FloatField()
+    lon = models.FloatField()
+
+    def __str__(self):
+        return self.lat, self.lon
+

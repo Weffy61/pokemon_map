@@ -1,4 +1,4 @@
-from .models import Pokemon
+from .models import Pokemon, PokemonEntity
 from django.contrib import admin
 
 
@@ -6,3 +6,7 @@ from django.contrib import admin
 class PokemonAdmin(admin.ModelAdmin):
     list_display = ['title']
 
+
+@admin.register(PokemonEntity)
+class PokemonEntityAdmin(admin.ModelAdmin):
+    pass
