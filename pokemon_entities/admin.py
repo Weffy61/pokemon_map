@@ -9,4 +9,5 @@ class PokemonAdmin(admin.ModelAdmin):
 
 @admin.register(PokemonEntity)
 class PokemonEntityAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['pokemon', 'level', 'appeared_at', 'disappeared_at']
+
