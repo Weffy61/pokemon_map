@@ -88,8 +88,14 @@ def show_pokemon(request, pokemon_id):
                 "level": pokemon_entity.level,
                 "lat": pokemon_entity.lat,
                 "lon": pokemon_entity.lon,
-            }
+            },
         }
+        if pokemon_entity.pokemon.previous_evolution:
+            pokemon['previous_evolution'] = {
+                "title_ru": pokemon_entity.pokemon.previous_evolution.title_ru,
+                "pokemon_id": pokemon_entity.pokemon.previous_evolution.pk,
+                "img_url": request.build_absolute_uri(f'{MEDIA_URL}{pokemon_entity.pokemon.previous_evolution.image}')
+            }
 
         add_pokemon(
             folium_map, pokemon_entity.lat,
