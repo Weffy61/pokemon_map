@@ -75,6 +75,7 @@ def show_pokemon(request, pokemon_id):
     for pokemon_entity in pokemon_entities.filter(pokemon=requested_pokemon,
                                                   appeared_at__lt=time_now,
                                                   disappeared_at__gt=time_now):
+        # print(pokemon_entity.pokemon.next_evolution.get())
         img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon_entity.pokemon.image}')
         pokemon = {
             "pokemon_id": pokemon_entity.pokemon.pk,
@@ -90,12 +91,23 @@ def show_pokemon(request, pokemon_id):
                 "lon": pokemon_entity.lon,
             },
         }
+
         if pokemon_entity.pokemon.previous_evolution:
             pokemon['previous_evolution'] = {
                 "title_ru": pokemon_entity.pokemon.previous_evolution.title_ru,
                 "pokemon_id": pokemon_entity.pokemon.previous_evolution.pk,
                 "img_url": request.build_absolute_uri(f'{MEDIA_URL}{pokemon_entity.pokemon.previous_evolution.image}')
             }
+        try:
+            if pokemon_entity.pokemon.next_evolution.get():
+                pokemon['next_evolution'] = {
+                    "title_ru": pokemon_entity.pokemon.next_evolution.get().title_ru,
+                    "pokemon_id": pokemon_entity.pokemon.next_evolution.get().pk,
+                    "img_url": request.build_absolute_uri(f'{MEDIA_URL}'
+                                                          f'{pokemon_entity.pokemon.next_evolution.get().image}')
+                }
+        except Pokemon.DoesNotExist:
+            continue
 
         add_pokemon(
             folium_map, pokemon_entity.lat,
