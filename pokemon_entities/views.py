@@ -52,7 +52,7 @@ def show_all_pokemons(request):
         pokemons_on_page.append({
             'pokemon_id': pokemon.pk,
             'img_url': img_path,
-            'title_ru': pokemon.title,
+            'title_ru': pokemon.title_ru,
         })
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
@@ -75,7 +75,9 @@ def show_pokemon(request, pokemon_id):
         img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon_entity.pokemon.image}')
         pokemon = {
             "pokemon_id": pokemon_entity.pokemon.pk,
-            "title_ru": pokemon_entity.pokemon.title,
+            "title_ru": pokemon_entity.pokemon.title_ru,
+            "title_en": pokemon_entity.pokemon.title_en,
+            "title_jp": pokemon_entity.pokemon.title_jp,
             "description": pokemon_entity.pokemon.descr,
             "img_url":  img_path,
             "entity":
