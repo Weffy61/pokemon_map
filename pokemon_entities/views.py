@@ -4,6 +4,7 @@ from .models import Pokemon, PokemonEntity
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from pogomap.settings import MEDIA_URL, MEDIA_ROOT
+from django.utils.timezone import localtime
 
 
 MOSCOW_CENTER = [55.751244, 37.618423]
@@ -27,41 +28,16 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
     ).add_to(folium_map)
 
 
-# def show_all_pokemons(request):
-#     with open('pokemon_entities/pokemons.json', encoding='utf-8') as database:
-#         pokemons = json.load(database)['pokemons']
-#     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-#     for pokemon in pokemons:
-#         for pokemon_entity in pokemon['entities']:
-#             add_pokemon(
-#                 folium_map, pokemon_entity['lat'],
-#                 pokemon_entity['lon'],
-#                 pokemon['img_url']
-#             )
-#
-#     pokemons_on_page = []
-#     pokemons = Pokemon.objects.all()
-#
-#     for pokemon in pokemons:
-#         pokemon_img = f'{MEDIA_URL}{pokemon.image}'
-#         pokemons_on_page.append({
-#             'pokemon_id': pokemon.pk,
-#             'img_url': pokemon_img,
-#             'title_ru': pokemon.title,
-#         })
-#     return render(request, 'mainpage.html', context={
-#         'map': folium_map._repr_html_(),
-#         'pokemons': pokemons_on_page,
-#     })
-
-
 def show_all_pokemons(request):
     pokemons = Pokemon.objects.all()
     pokemon_entities = PokemonEntity.objects.all()
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon in pokemons:
         pokemon_img = f'{MEDIA_ROOT}/{pokemon.image}'
-        for pokemon_entity in pokemon_entities.filter(pokemon=pokemon):
+        time_now = localtime()
+        for pokemon_entity in pokemon_entities.filter(pokemon=pokemon,
+                                                      appeared_at__lt=time_now,
+                                                      disappeared_at__gt=time_now):
             add_pokemon(
                 folium_map, pokemon_entity.lat,
                 pokemon_entity.lon,
