@@ -33,7 +33,8 @@ def show_all_pokemons(request):
     pokemon_entities = PokemonEntity.objects.all()
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon in pokemons:
-        pokemon_img = f'{MEDIA_ROOT}/{pokemon.image}'
+        img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon.image}')
+        pokemon_img = img_path
         time_now = localtime()
         for pokemon_entity in pokemon_entities.filter(pokemon=pokemon,
                                                       appeared_at__lt=time_now,
@@ -47,10 +48,10 @@ def show_all_pokemons(request):
     pokemons_on_page = []
 
     for pokemon in pokemons:
-        pokemon_img = f'{MEDIA_URL}{pokemon.image}'
+        img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon.image}')
         pokemons_on_page.append({
             'pokemon_id': pokemon.pk,
-            'img_url': pokemon_img,
+            'img_url': img_path,
             'title_ru': pokemon.title,
         })
     return render(request, 'mainpage.html', context={
@@ -60,21 +61,33 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    with open('pokemon_entities/pokemons.json', encoding='utf-8') as database:
-        pokemons = json.load(database)['pokemons']
-
+    pokemons = Pokemon.objects.all()
+    pokemon_entities = PokemonEntity.objects.all()
     for pokemon in pokemons:
-        if pokemon['pokemon_id'] == int(pokemon_id):
+        if pokemon.pk == int(pokemon_id):
             requested_pokemon = pokemon
             break
     else:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    for pokemon_entity in requested_pokemon['entities']:
+    for pokemon_entity in pokemon_entities.filter(pokemon=requested_pokemon):
+        img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon_entity.pokemon.image}')
+        pokemon = {
+            "pokemon_id": pokemon_entity.pokemon.pk,
+            "title_ru": pokemon_entity.pokemon.title,
+            "img_url":  img_path,
+            "entity":
+            {
+                "level": pokemon_entity.level,
+                "lat": pokemon_entity.lat,
+                "lon": pokemon_entity.lon,
+            }
+        }
+
         add_pokemon(
-            folium_map, pokemon_entity['lat'],
-            pokemon_entity['lon'],
+            folium_map, pokemon_entity.lat,
+            pokemon_entity.lon,
             pokemon['img_url']
         )
 
