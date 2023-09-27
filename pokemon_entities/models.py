@@ -2,12 +2,14 @@ from django.db import models
 
 
 class Pokemon(models.Model):
-    title = models.CharField(max_length=200)
+    title_ru = models.CharField(max_length=200)
+    title_en = models.CharField(max_length=200, null=False)
+    title_jp = models.CharField(max_length=200, null=False)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     descr = models.TextField(max_length=400, null=False)
 
     def __str__(self):
-        return self.title
+        return self.title_ru
 
     class Meta:
         verbose_name = "Pokemon"
@@ -27,5 +29,5 @@ class PokemonEntity(models.Model):
     stamina = models.IntegerField(null=False)
 
     def __str__(self):
-        return self.pokemon.title
+        return self.pokemon.title_ru
 
