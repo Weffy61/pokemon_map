@@ -32,8 +32,7 @@ def show_all_pokemons(request):
     pokemon_entities = PokemonEntity.objects.all()
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon in pokemons:
-        img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon.image}')
-        pokemon_img = img_path
+        pokemon_img_path = request.build_absolute_uri(pokemon.image.url)
         time_now = localtime()
         for pokemon_entity in pokemon_entities.filter(pokemon=pokemon,
                                                       appeared_at__lt=time_now,
@@ -41,16 +40,16 @@ def show_all_pokemons(request):
             add_pokemon(
                 folium_map, pokemon_entity.lat,
                 pokemon_entity.lon,
-                pokemon_img
+                pokemon_img_path
             )
 
     pokemons_on_page = []
 
     for pokemon in pokemons:
-        img_path = request.build_absolute_uri(f'{MEDIA_URL}{pokemon.image}')
+        pokemon_img_path = request.build_absolute_uri(pokemon.image.url)
         pokemons_on_page.append({
             'pokemon_id': pokemon.pk,
-            'img_url': img_path,
+            'img_url': pokemon_img_path,
             'title_ru': pokemon.title_ru,
         })
     return render(request, 'mainpage.html', context={
@@ -73,29 +72,29 @@ def show_pokemon(request, pokemon_id):
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
-    img_path = request.build_absolute_uri(f'{MEDIA_URL}{requested_pokemon.image}')
+    pokemon_img_path = request.build_absolute_uri(pokemon.image.url)
     pokemon = {
         "pokemon_id": requested_pokemon.pk,
         "title_ru": requested_pokemon.title_ru,
         "title_en": requested_pokemon.title_en,
         "title_jp": requested_pokemon.title_jp,
         "description": requested_pokemon.descr,
-        "img_url": img_path,
+        "img_url": pokemon_img_path,
         "entities": []
     }
     if requested_pokemon.previous_evolution:
         pokemon['previous_evolution'] = {
             "title_ru": requested_pokemon.previous_evolution.title_ru,
             "pokemon_id": requested_pokemon.previous_evolution.pk,
-            "img_url": request.build_absolute_uri(f'{MEDIA_URL}{requested_pokemon.previous_evolution.image}')
+            "img_url": request.build_absolute_uri(requested_pokemon.previous_evolution.image.url)
         }
     try:
         if requested_pokemon.next_evolutions:
             pokemon['next_evolution'] = {
                 "title_ru": requested_pokemon.next_evolutions.get().title_ru,
                 "pokemon_id": requested_pokemon.next_evolutions.get().pk,
-                "img_url": request.build_absolute_uri(f'{MEDIA_URL}'
-                                                      f'{requested_pokemon.next_evolutions.get().image}')}
+                "img_url": request.build_absolute_uri(requested_pokemon.next_evolutions.get().image.url)
+            }
     except Pokemon.DoesNotExist:
         pass
     except Pokemon.MultipleObjectsReturned:
