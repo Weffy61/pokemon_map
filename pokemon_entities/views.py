@@ -30,20 +30,24 @@ def show_all_pokemons(request):
     time_now = localtime()
     pokemon_entities = PokemonEntity.objects.filter(appeared_at__lt=time_now,
                                                     disappeared_at__gt=time_now)
-    pokemons_on_page = []
 
     for pokemon_entity in pokemon_entities:
         pokemon_img_path = request.build_absolute_uri(pokemon_entity.pokemon.image.url)
-        pokemons_on_page.append({
-            'pokemon_id': pokemon_entity.pokemon.pk,
-            'img_url': pokemon_img_path,
-            'title_ru': pokemon_entity.pokemon.title_ru,
-        })
         add_pokemon(
             folium_map, pokemon_entity.lat,
             pokemon_entity.lon,
             pokemon_img_path
         )
+    pokemons = Pokemon.objects.all()
+    pokemons_on_page = []
+
+    for pokemon in pokemons:
+        pokemon_img_path = request.build_absolute_uri(pokemon.image.url)
+        pokemons_on_page.append({
+            'pokemon_id': pokemon.pk,
+            'img_url': pokemon_img_path,
+            'title_ru': pokemon.title_ru,
+        })
 
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
