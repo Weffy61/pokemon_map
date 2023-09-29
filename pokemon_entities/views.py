@@ -78,17 +78,13 @@ def show_pokemon(request, pokemon_id):
             "pokemon_id": requested_pokemon.previous_evolution.pk,
             "img_url": request.build_absolute_uri(requested_pokemon.previous_evolution.image.url)
         }
-    try:
-        if requested_pokemon.next_evolutions:
-            pokemon['next_evolution'] = {
-                "title_ru": requested_pokemon.next_evolutions.get().title_ru,
-                "pokemon_id": requested_pokemon.next_evolutions.get().pk,
-                "img_url": request.build_absolute_uri(requested_pokemon.next_evolutions.get().image.url)
-            }
-    except Pokemon.DoesNotExist:
-        pass
-    except Pokemon.MultipleObjectsReturned:
-        pass
+
+    if requested_pokemon.next_evolutions.first():
+        pokemon['next_evolution'] = {
+            "title_ru": requested_pokemon.next_evolutions.get().title_ru,
+            "pokemon_id": requested_pokemon.next_evolutions.get().pk,
+            "img_url": request.build_absolute_uri(requested_pokemon.next_evolutions.get().image.url)
+        }
 
     for pokemon_entity in pokemon_entities:
         entity = {
