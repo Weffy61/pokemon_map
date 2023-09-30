@@ -6,7 +6,7 @@ class Pokemon(models.Model):
     title_en = models.CharField(max_length=200, blank=True, verbose_name='Имя покемона на английском')
     title_jp = models.CharField(max_length=200, blank=True, verbose_name='Имя покемона на японском')
     image = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name='Изобрадение')
-    descr = models.TextField(max_length=400, blank=True, verbose_name='Описание')
+    description = models.TextField(blank=True, verbose_name='Описание')
     previous_evolution = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
                                            related_name='next_evolutions', verbose_name='Предыдущее поколение покемона')
 

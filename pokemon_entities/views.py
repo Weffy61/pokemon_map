@@ -72,7 +72,7 @@ def show_pokemon(request, pokemon_id):
         "title_ru": requested_pokemon.title_ru,
         "title_en": requested_pokemon.title_en,
         "title_jp": requested_pokemon.title_jp,
-        "description": requested_pokemon.descr,
+        "description": requested_pokemon.description,
         "img_url": pokemon_img_path,
         "entities": []
     }
